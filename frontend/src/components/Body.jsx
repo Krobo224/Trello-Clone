@@ -18,8 +18,8 @@ const reorderList = (sourceList, startIndex, endIndex) => {
 
 const Body = () => {
   const [state, setState] = useState(false);
-  // const onDragEnd = (result) => {
-  //   const { destination, source } = result;
+  const onDragEnd = (result) => {
+    const { destination, source } = result;
 
   //   // If user tries to drop in unknown destination
   //   if (!destination) return;
@@ -54,7 +54,7 @@ const Body = () => {
     // If user drops to other list
 
 
-  // };
+  };
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
