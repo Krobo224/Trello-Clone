@@ -12,11 +12,15 @@ const AddNew = ({ type, parentId }) => {
   const submitHandler = (e) => {
     e.preventDefault();
     if (type) {
+      const num = Math.random();
+      const id = num.toString();
       dispatch(
-        addCard({ id: Math.random(), title: inputVal, parentId: parentId })
+        addCard({ id: id, title: inputVal, parentId: parentId })
       );
     } else {
-      dispatch(addList({ id: Math.random(), title: inputVal }));
+      const num = Math.random();
+      const id = num.toString();
+      dispatch(addList({ id: id, title: inputVal }));
     }
     hideForm();
     setInputVal("");
