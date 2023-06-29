@@ -1,26 +1,34 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Card from "./Card";
 import AddNew from "./AddNew";
-import { useSelector } from "react-redux";
-import { Draggable, Droppable } from "react-beautiful-dnd";
-import { useState, useEffect } from "react";
-import { DragDropContext } from "react-beautiful-dnd";
+import { useSelector, useDispatch } from "react-redux";
+import { Draggable, Droppable, DragDropContext } from "react-beautiful-dnd";
+
+const reorderColumnList = (sourceCol, startIndex, endIndex) => {
+  console.log(sourceCol);
+  const newChildrens = Array.from(sourceCol.children);
+  const [removed] = newChildrens.splice(startIndex, 1);
+  newChildrens.splice(endIndex, 0, removed);
+
+  const newColumn = {
+    ...sourceCol,
+    children: newChildrens,
+  };
+
+  return newColumn;
+};
 
 const List = () => {
   const listItem = useSelector((store) => store.listSlice.list);
   const [state, setState] = useState(listItem);
-  
-  // console.log("state ", state);
-  // console.log("LIST ITEM ", listItem);
 
   const onDragEnd = (result) => {
-    console.log("result: ", result);
     const { destination, source } = result;
 
-    // If user tries to drop in unknown destination
+    console.log("desintation", destination, "source", source);
+
     if (!destination) return;
 
-    // If user destination === source
     if (
       destination.droppableId === source.droppableId &&
       destination.index === source.index
@@ -28,41 +36,63 @@ const List = () => {
       return;
     }
 
-    // Retrieve the source and destination lists from the state
-    const sourceListIndex = state.listSlice.list.findIndex(
-      (item) => item.id === source.droppableId
-    );
-    const destinationListIndex = state.listSlice.list.findIndex(
+    console.log(state);
+
+    const sourceCol = state.filter((item) => item.id === source.droppableId)[0];
+    const destinationCol = state.filter(
       (item) => item.id === destination.droppableId
-    );
-    // console.log("----------", list);
-    const updatedListItem = { ...listItem };
+    )[0];
 
-    // Reorder cards within the same list
-    if (source.droppableId === destination.droppableId) {
-      const sourceList = updatedListItem.listSlice.list[sourceListIndex];
-      const [draggedItem] = sourceList.children.splice(source.index, 1);
-      sourceList.children.splice(destination.index, 0, draggedItem);
-    } else {
+    if (sourceCol.id === destinationCol.id) {
+      const newColumn = reorderColumnList(
+        sourceCol,
+        source.index,
+        destination.index
+      );
 
-      // Move card from source list to destination list
-      const sourceList = updatedListItem.listSlice.list[sourceListIndex];
-      const destinationList =
-        updatedListItem.listSlice.list[destinationListIndex];
+      const listIndex = state.findIndex((item) => item.id === newColumn.id);
+      const newArray = [...state];
+      newArray[listIndex] = newColumn;
+      setState(newArray);
 
-      const [draggedItem] = sourceList.children.splice(source.index, 1);
-      destinationList.children.splice(destination.index, 0, draggedItem);
+      return;
     }
 
-    setState(updatedListItem);
+    const initialChildren = Array.from(sourceCol.children);
+    const [removed] = initialChildren.splice(source.index, 1);
+    const newStartCol = {
+      ...sourceCol,
+      children: initialChildren,
+    };
+
+    const finalChildren = Array.from(destinationCol.children);
+    finalChildren.splice(destination.index, 0, removed);
+    const newEndCol = {
+      ...destinationCol,
+      children: finalChildren,
+    };
+
+    const startListIndex = state.findIndex(
+      (item) => item.id === newStartCol.id
+    );
+    const endListIndex = state.findIndex((item) => item.id === newEndCol.id);
+    const newArray = [...state];
+    newArray[startListIndex] = newStartCol;
+    newArray[endListIndex] = newEndCol;
+
+    setState(newArray);
   };
+
+  useEffect(() => {
+    setState(listItem);
+  }, [listItem]);
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      {listItem.map((list) => (
+      {state.map((list) => (
         <div className="p-3 w-1/3" key={list.id}>
           <div className="p-3 bg-gray-200">
-            <div className="mb-4"> {list.title} </div>
+            <div className="mb-4">{list.title}</div>
             <Droppable droppableId={list.id}>
               {(droppableProvided, droppableSnapshot) => (
                 <div
@@ -73,7 +103,7 @@ const List = () => {
                     list.children.map((children, index) => (
                       <Draggable
                         key={children.id}
-                        draggableId={`${children.id}`}
+                        draggableId={children.id}
                         index={index}
                       >
                         {(draggableProvided, draggableSnapshot) => (
@@ -82,7 +112,6 @@ const List = () => {
                             {...draggableProvided.draggableProps}
                             {...draggableProvided.dragHandleProps}
                           >
-                            {/* {draggableProvided.placeholder} */}
                             <Card key={children.id} cardInfo={children} />
                           </div>
                         )}
