@@ -26,6 +26,9 @@ const listSlice = createSlice({
         }
       });
     },
+    newCardName: (state, action) => {
+      
+    }
   },
 });
 

@@ -19,7 +19,7 @@ const reorderColumnList = (sourceCol, startIndex, endIndex) => {
 };
 
 const List = () => {
-  const listItem = useSelector((store) => store.listSlice.list);
+  const listItem = useSelector((store) => store.listSlice.list);  // the current state is returned
   const [state, setState] = useState(listItem);
 
   const onDragEnd = (result) => {
@@ -36,7 +36,7 @@ const List = () => {
       return;
     }
 
-    console.log(state);
+    console.log("HHH", state);
 
     const sourceCol = state.filter((item) => item.id === source.droppableId)[0];
     const destinationCol = state.filter(
@@ -51,7 +51,7 @@ const List = () => {
       );
 
       const listIndex = state.findIndex((item) => item.id === newColumn.id);
-      const newArray = [...state];
+      const newArray = [...state]; // copy of the state
       newArray[listIndex] = newColumn;
       setState(newArray);
 
