@@ -19,7 +19,7 @@ const reorderColumnList = (sourceCol, startIndex, endIndex) => {
 };
 
 const List = () => {
-  const listItem = useSelector((store) => store.listSlice.list);  // the current state is returned
+  const listItem = useSelector((store) => store.listSlice.list); // the current state is returned
   const [state, setState] = useState(listItem);
 
   const onDragEnd = (result) => {
@@ -60,13 +60,17 @@ const List = () => {
 
     const initialChildren = Array.from(sourceCol.children);
     const [removed] = initialChildren.splice(source.index, 1);
+    const updateParentOfRemoved = {
+      ...removed,
+      parentId: destination.droppableId,
+    };
     const newStartCol = {
       ...sourceCol,
       children: initialChildren,
     };
 
     const finalChildren = Array.from(destinationCol.children);
-    finalChildren.splice(destination.index, 0, removed);
+    finalChildren.splice(destination.index, 0, updateParentOfRemoved);
     const newEndCol = {
       ...destinationCol,
       children: finalChildren,
@@ -80,12 +84,18 @@ const List = () => {
     newArray[startListIndex] = newStartCol;
     newArray[endListIndex] = newEndCol;
 
+    console.log(newStartCol, newEndCol);
+
     setState(newArray);
   };
 
   useEffect(() => {
     setState(listItem);
   }, [listItem]);
+
+  useEffect(() => {
+    console.log(state, "current state");
+  }, [state]);
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
@@ -112,7 +122,12 @@ const List = () => {
                             {...draggableProvided.draggableProps}
                             {...draggableProvided.dragHandleProps}
                           >
-                            <Card key={children.id} cardInfo={children} setState={setState} state={state} />
+                            <Card
+                              key={children.id}
+                              cardInfo={children}
+                              setState={setState}
+                              state={state}
+                            />
                           </div>
                         )}
                       </Draggable>

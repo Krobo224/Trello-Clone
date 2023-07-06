@@ -6,25 +6,29 @@ const Card = ({ cardInfo, setState, state }) => {
   const listItem = useSelector((store) => store.listSlice.list);
   const [currCardInfo, setCardInfo] = useState(cardInfo);
 
-  const updateTitle = (e) => {
-    const columnIndex = state.findIndex(
-      (item) => item.id === cardInfo.parent
-    );
-    const newArray = [...state];
-    
-    const childrens = Array.from(newArray[columnIndex].children);
-    const childrenIndex = childrens.findIndex(
-      (item) => item.id === cardInfo.id
-    );
-    childrens[childrenIndex].title = e.target.value;
-    console.log("newarray ", newArray);
-    
-    setState(newArray);
-    // setCardInfo({
-    //   ...currCardInfo,
-    //   title: e,
-    // });
+  const updateTitle = (id, parentId, e) => {
+    const updatedState = state.map((item) => {
+      if (item.id === parentId) {
+        // console.log("lol here");
+        return {
+          ...item,
+          children: item.children.map((child) => {
+            // console.log("mhhh");
+            console.log(child, id);
+            if (child.id === id) {
+              // console.log("comes here");
+              return { ...child, title: e.target.value };
+            } else {
+              return child;
+            }
+          }),
+        };
+      } else {
+        return item;
+      }
+    });
 
+    setState(updatedState);
   };
   return (
     <div className="bg-white p-2 mt-2 shadow-md rounded-md">
@@ -32,7 +36,7 @@ const Card = ({ cardInfo, setState, state }) => {
         type="text"
         defaultValue={cardInfo.title}
         text={currCardInfo.title}
-        onChange={updateTitle}
+        onChange={(e) => updateTitle(cardInfo.id, cardInfo.parentId, e)}
       />
     </div>
   );
