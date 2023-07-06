@@ -112,7 +112,7 @@ const List = () => {
                             {...draggableProvided.draggableProps}
                             {...draggableProvided.dragHandleProps}
                           >
-                            <Card key={children.id} cardInfo={children} />
+                            <Card key={children.id} cardInfo={children} setState={setState} state={state} />
                           </div>
                         )}
                       </Draggable>
