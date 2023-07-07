@@ -1,22 +1,24 @@
 import React from "react";
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { updateList } from "../store/listSlice";
 
 const Card = ({ cardInfo, setState, state }) => {
   const listItem = useSelector((store) => store.listSlice.list);
   const [currCardInfo, setCardInfo] = useState(cardInfo);
+  const dispatch = useDispatch();
 
   const updateTitle = (id, parentId, e) => {
     const updatedState = state.map((item) => {
       if (item.id === parentId) {
-        // console.log("lol here");
+        console.log("lol here");
         return {
           ...item,
           children: item.children.map((child) => {
-            // console.log("mhhh");
+            console.log("meow");
             console.log(child, id);
             if (child.id === id) {
-              // console.log("comes here");
+              console.log("comes here");
               return { ...child, title: e.target.value };
             } else {
               return child;
@@ -28,6 +30,7 @@ const Card = ({ cardInfo, setState, state }) => {
       }
     });
 
+    dispatch(updateList(updatedState));
     setState(updatedState);
   };
   return (

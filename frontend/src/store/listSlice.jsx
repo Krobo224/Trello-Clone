@@ -26,11 +26,11 @@ const listSlice = createSlice({
         }
       });
     },
-    newCardName: (state, action) => {
-      
-    }
+    updateList: (state, action) => {
+      state.list = action.payload;
+    },
   },
 });
 
-export const { addList, addCard } = listSlice.actions;
+export const { addList, addCard, updateList } = listSlice.actions;
 export default listSlice.reducer;
